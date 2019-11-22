@@ -116,11 +116,7 @@ class ElasticsearchEngine extends Engine
             'size' => $perPage,
         ]);
 
-
-
         $result['nbPages'] = $result['hits']['total']["value"] / $perPage;
-
-
 
         return $result;
     }
@@ -215,11 +211,25 @@ class ElasticsearchEngine extends Engine
      */
     public function map(Builder $builder, $results, $model)
     {
-        if ($results['hits']['total'] === 0) {
+        if ($results['hits']['total']['value'] === 0) {
             return $model->newCollection();
         }
 
         $keys = collect($results['hits']['hits'])->pluck('_id')->values()->all();
+
+        //修改Laravel\Scout\Searchable  getScoutModelsByIds 函数 增加排序功能
+        // $query = $query->whereIn(
+        //     $this->getScoutKeyName(),
+        //     $ids
+        // );
+
+        // //排序
+        // if (count($builder->orders)) {
+        //     foreach ($builder->orders as  $order) {
+        //         $query = $query->orderBy($order["column"], $order["direction"]);
+        //     }
+        // }
+        // return $query->get();
 
         return $model->getScoutModelsByIds(
             $builder,
