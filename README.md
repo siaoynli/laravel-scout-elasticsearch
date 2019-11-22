@@ -37,6 +37,38 @@ You must add the Scout service provider and the package service provider in your
 ...
 ```
 
+## 说明
+
+包依赖 elasticsearch/elasticsearch
+安装 elasticsearch/elasticsearch 包如果>=7.4 需要修改
+Elasticsearch\Endpoints\Search
+删除 26 行，否则会报错
+
+```
+if (isset($type)) {
+            trigger_error('Specifying types in urls has been deprecated', E_USER_DEPRECATED);
+}
+```
+
+如果需要排序功能
+修改 Laravel\Scout\Searchable
+getScoutModelsByIds 函数 增加排序功能,并且排序字段定义的时候需要和表字段相同
+
+```
+         $query = $query->whereIn(
+             $this->getScoutKeyName(),
+             $ids
+         );
+
+         //排序
+         if (count($builder->orders)) {
+             foreach ($builder->orders as  $order) {
+                 $query = $query->orderBy($order["column"], $order["direction"]);
+             }
+         }
+         return $query->get();
+```
+
 ## License
 
 The MIT License (MIT).
